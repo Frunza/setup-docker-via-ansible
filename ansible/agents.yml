@@ -1,0 +1,42 @@
+# ansible/agents.yml
+- name: Install and configure RKE2 agents
+  hosts: agents
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Ensure config directory exists
+      ansible.builtin.file:
+        path: "{{ rke2ConfigDir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install RKE2 agent
+      ansible.builtin.shell: curl -sfL {{ rke2InstallScriptUrl }} | INSTALL_RKE2_TYPE=agent INSTALL_RKE2_VERSION={{ rke2Version }} sh -
+      args:
+        creates: /usr/local/bin/rke2
+
+    - name: Write agent config
+      ansible.builtin.copy:
+        dest: "{{ rke2ConfigFile }}"
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          server: https://{{ rke2RegistrationAddress }}:{{ rke2RegistrationPort }}
+          token: {{ rke2Token }}
+      notify: restart rke2-agent
+
+    - name: Ensure rke2-agent is enabled and started
+      ansible.builtin.systemd:
+        name: rke2-agent
+        enabled: true
+        state: started
+
+  handlers:
+    - name: restart rke2-agent
+      ansible.builtin.systemd:
+        name: rke2-agent
+        state: restarted

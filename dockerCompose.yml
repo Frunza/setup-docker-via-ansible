@@ -1,0 +1,10 @@
+services:
+  main:
+    image: ansibledocker
+    network_mode: host
+    working_dir: /app
+    environment:
+      # location of ansible config: https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings-locations
+      - ANSIBLE_CONFIG=/app/ansible/ansible.cfg
+    entrypoint: ["sh", "-c"]
+    command: ["sh runAnsible.sh"]
