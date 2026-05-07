@@ -49,7 +49,7 @@ services:
     entrypoint: ["sh", "-c"]
     command: ["sh runAnsible.sh"]
 ```
-The service is called *main*, and it runs a script for `Ansible`. We also have an environment variables with the SSH key needed to connect to the virtual machines, used by `Ansible`.
+The service is called *main*, and it runs a script for `Ansible`.
 
 In the *runAnsible.sh* script we just want to do call our `Ansible` playbook like:
 ```sh
